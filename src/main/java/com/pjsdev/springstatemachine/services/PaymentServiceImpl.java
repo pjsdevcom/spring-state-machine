@@ -7,6 +7,7 @@ import com.pjsdev.springstatemachine.repository.PaymentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.config.StateMachineFactory;
+import org.springframework.statemachine.support.DefaultStateMachineContext;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
@@ -25,16 +26,36 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public StateMachine<PaymentState, PaymentEvent> preAuth(Long paymentId) {
+        StateMachine<PaymentState, PaymentEvent> sm = build(paymentId);
         return null;
     }
 
     @Override
     public StateMachine<PaymentState, PaymentEvent> authorisePayment(Long paymentId) {
+        StateMachine<PaymentState, PaymentEvent> sm = build(paymentId);
         return null;
     }
 
     @Override
     public StateMachine<PaymentState, PaymentEvent> declineAuth(Long paymentId) {
+        StateMachine<PaymentState, PaymentEvent> sm = build(paymentId);
         return null;
+    }
+
+    //to initialize SM from database
+    private StateMachine<PaymentState, PaymentEvent> build(Long paymentId) {
+        Payment payment = paymentRepository.getById(paymentId);
+
+        StateMachine<PaymentState, PaymentEvent> sm = stateMachineFactory.getStateMachine(Long.toString(payment.getId()));
+
+        sm.stop();
+
+        sm.getStateMachineAccessor()
+                .doWithAllRegions(sma -> sma.resetStateMachine(new DefaultStateMachineContext<>(payment.getState(),
+                        null, null, null)));
+
+        sm.start();
+
+        return sm;
     }
 }
