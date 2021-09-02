@@ -42,7 +42,7 @@ class PaymentServiceImplTest {
 
         Payment preAuthorisedPayment = paymentRepository.getById(savedPayment.getId());
 
-        System.out.println(sm.getState().getId()); //should be PRE_AUTH
+        System.out.println(sm.getState().getId()); //should be PRE_AUTH or PRE_AUTH_ERROR
 
         System.out.println(preAuthorisedPayment);
     }
